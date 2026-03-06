@@ -1,6 +1,6 @@
 import React from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router';
-import { Instagram, Facebook, Twitter, Linkedin, Dribbble, User as UserIcon, LogOut, ChevronDown } from 'lucide-react';
+import { Instagram, Facebook, Twitter, Linkedin, Dribbble, User as UserIcon, LogOut, ChevronDown, Menu, X } from 'lucide-react';
 import { ScrollToTop } from './ScrollToTop';
 import { Toaster, toast } from 'sonner';
 import { getCurrentUser, logout } from '../store';
@@ -12,6 +12,12 @@ export function Layout() {
   const isAuthPage = location.pathname === '/login' || location.pathname === '/signup';
   const isAdminPage = location.pathname.startsWith('/admin');
   const user = getCurrentUser();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
+
+  // Close mobile menu on route change
+  React.useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [location.pathname]);
 
   const handleLogout = () => {
     logout();
@@ -52,37 +58,85 @@ export function Layout() {
           )}
         </div>
         {!isAuthPage && (
-          <div className="hidden lg:flex items-center gap-4">
-            {user ? (
-              <div className="flex items-center gap-6">
-                <Link to="/profile" className="flex items-center gap-3 group">
-                  <div className="w-10 h-10 rounded-full bg-[#4640DE] flex items-center justify-center text-white font-bold group-hover:scale-105 transition-transform">
-                    {user.name.charAt(0)}
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-sm font-bold text-[#25324b] leading-none group-hover:text-[#4640DE] transition-colors">{user.name}</span>
-                    <span className="text-[10px] text-[#7c8493] font-bold uppercase tracking-wider">My Profile</span>
-                  </div>
-                </Link>
-                <div className="w-px h-8 bg-[#D6DDEB]"></div>
-                <button
-                  onClick={handleLogout}
-                  className="p-2 hover:bg-red-50 text-[#7c8493] hover:text-red-500 rounded-lg transition-all"
-                  title="Logout"
-                >
-                  <LogOut className="w-5 h-5" />
-                </button>
-              </div>
-            ) : (
-              <>
-                <Link to="/login" className="font-bold text-[#4640DE] px-6 py-3 hover:bg-[#4640DE]/5 transition-colors rounded">Login</Link>
-                <div className="w-px h-12 bg-[#D6DDEB]"></div>
-                <Link to="/signup" className="font-bold text-white bg-[#4640DE] px-6 py-3 rounded hover:bg-[#4640DE]/90 transition-colors">Sign Up</Link>
-              </>
-            )}
+          <div className="flex items-center gap-4">
+            <div className="hidden lg:flex items-center gap-4">
+              {user ? (
+                <div className="flex items-center gap-6">
+                  <Link to="/profile" className="flex items-center gap-3 group">
+                    <div className="w-10 h-10 rounded-full bg-[#4640DE] flex items-center justify-center text-white font-bold group-hover:scale-105 transition-transform">
+                      {user.name.charAt(0)}
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-sm font-bold text-[#25324b] leading-none group-hover:text-[#4640DE] transition-colors">{user.name}</span>
+                      <span className="text-[10px] text-[#7c8493] font-bold uppercase tracking-wider">My Profile</span>
+                    </div>
+                  </Link>
+                  <div className="w-px h-8 bg-[#D6DDEB]"></div>
+                  <button
+                    onClick={handleLogout}
+                    className="p-2 hover:bg-red-50 text-[#7c8493] hover:text-red-500 rounded-lg transition-all"
+                    title="Logout"
+                  >
+                    <LogOut className="w-5 h-5" />
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <Link to="/login" className="font-bold text-[#4640DE] px-6 py-3 hover:bg-[#4640DE]/5 transition-colors rounded">Login</Link>
+                  <div className="w-px h-12 bg-[#D6DDEB]"></div>
+                  <Link to="/signup" className="font-bold text-white bg-[#4640DE] px-6 py-3 rounded hover:bg-[#4640DE]/90 transition-colors">Sign Up</Link>
+                </>
+              )}
+            </div>
+
+            {/* Mobile Menu Toggle */}
+            <button
+              className="lg:hidden p-2 text-[#25324b] hover:bg-gray-100 rounded-md transition-colors"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            >
+              {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
           </div>
         )}
       </nav>
+
+      {/* Mobile Menu Overlay */}
+      {isMobileMenuOpen && !isAuthPage && (
+        <div className="lg:hidden absolute top-[80px] left-0 w-full bg-white shadow-xl z-50 flex flex-col font-medium border-t border-gray-100 origin-top animate-in slide-in-from-top-2 duration-200">
+          <div className="flex flex-col p-6 gap-6">
+            <Link to="/jobs" className="text-lg hover:text-[#4640DE] transition-colors">Find Jobs</Link>
+            <Link to="/companies" className="text-lg hover:text-[#4640DE] transition-colors">Browse Companies</Link>
+
+            <div className="w-full text-[#D6DDEB]"></div>
+
+            {user ? (
+              <div className="flex flex-col gap-6">
+                <Link to="/profile" className="flex items-center gap-4 group">
+                  <div className="w-12 h-12 rounded-full bg-[#4640DE] flex items-center justify-center text-white font-bold text-lg">
+                    {user.name.charAt(0)}
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-lg font-bold text-[#25324b] leading-none group-hover:text-[#4640DE] transition-colors">{user.name}</span>
+                    <span className="text-sm text-[#7c8493] font-bold uppercase tracking-wider mt-1">My Profile</span>
+                  </div>
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center gap-3 text-red-500 font-bold hover:bg-red-50 p-3 rounded-md transition-colors"
+                >
+                  <LogOut className="w-5 h-5" />
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-4">
+                <Link to="/login" className="font-bold text-[#4640DE] w-full text-center py-3 border border-[#4640DE] rounded hover:bg-[#4640DE]/5 transition-colors">Login</Link>
+                <Link to="/signup" className="font-bold text-white bg-[#4640DE] w-full text-center py-3 rounded hover:bg-[#4640DE]/90 transition-colors">Sign Up</Link>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col">
