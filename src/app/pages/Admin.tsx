@@ -84,26 +84,16 @@ export function Admin() {
     navigate('/login');
   };
 
-  const handleDeleteJob = (id: string) => {
-    toast.error('Are you sure?', {
-      description: 'This action cannot be undone.',
-      action: {
-        label: 'Delete',
-        onClick: async () => {
-          try {
-            await deleteJob(id);
-            await loadData();
-            toast.success('Job deleted successfully');
-          } catch (err) {
-            toast.error('Error deleting job');
-          }
-        }
-      },
-      cancel: {
-        label: 'Cancel',
-        onClick: () => { }
+  const handleDeleteJob = async (id: string) => {
+    if (window.confirm('Are you sure you want to delete this job? This action cannot be undone.')) {
+      try {
+        await deleteJob(id);
+        await loadData();
+        toast.success('Job deleted successfully');
+      } catch (err) {
+        toast.error('Error deleting job');
       }
-    });
+    }
   };
 
   const handleEditJob = (job: Job) => {
