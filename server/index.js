@@ -47,10 +47,18 @@ const requireDb = async (req, res, next) => {
     }
 };
 
-app.use('/api', requireDb);
+// Create a central API router
+const apiRouter = express.Router();
+apiRouter.use(requireDb);
+
+// Mount the router on both `/api` (for local dev) and `/` (for Vercel serverless functions where the path is rewritten)
+app.use('/api', apiRouter);
+// IMPORTANT: Vercel routes `/api/*` to this file. Sometimes it passes the whole path, sometimes it strips it.
+// To be safe, we also bind the router to the root so it catches requests that hit the serverless function directly.
+app.use('/', apiRouter);
 
 // Jobs
-app.get('/api/jobs', async (req, res) => {
+apiRouter.get('/jobs', async (req, res) => {
     try {
         const jobs = await Job.find().sort({ createdAt: -1 });
         res.json(jobs);
@@ -59,7 +67,8 @@ app.get('/api/jobs', async (req, res) => {
     }
 });
 
-app.get('/api/jobs/:id', async (req, res) => {
+
+apiRouter.get('/jobs/:id', async (req, res) => {
     try {
         const job = await Job.findById(req.params.id);
         if (!job) return res.status(404).json({ message: 'Job not found' });
@@ -69,7 +78,7 @@ app.get('/api/jobs/:id', async (req, res) => {
     }
 });
 
-app.post('/api/jobs', async (req, res) => {
+apiRouter.post('/jobs', async (req, res) => {
     try {
         const job = new Job(req.body);
         await job.save();
@@ -79,7 +88,7 @@ app.post('/api/jobs', async (req, res) => {
     }
 });
 
-app.put('/api/jobs/:id', async (req, res) => {
+apiRouter.put('/jobs/:id', async (req, res) => {
     try {
         const job = await Job.findByIdAndUpdate(req.params.id, req.body, { new: true });
         res.json(job);
@@ -88,7 +97,7 @@ app.put('/api/jobs/:id', async (req, res) => {
     }
 });
 
-app.delete('/api/jobs/:id', async (req, res) => {
+apiRouter.delete('/jobs/:id', async (req, res) => {
     try {
         await Job.findByIdAndDelete(req.params.id);
         res.json({ message: 'Job deleted' });
@@ -98,7 +107,7 @@ app.delete('/api/jobs/:id', async (req, res) => {
 });
 
 // Applications
-app.get('/api/applications', async (req, res) => {
+apiRouter.get('/applications', async (req, res) => {
     try {
         const apps = await Application.find().sort({ date: -1 });
         res.json(apps);
@@ -107,7 +116,7 @@ app.get('/api/applications', async (req, res) => {
     }
 });
 
-app.post('/api/applications', async (req, res) => {
+apiRouter.post('/applications', async (req, res) => {
     try {
         const app = new Application(req.body);
         await app.save();
@@ -117,7 +126,7 @@ app.post('/api/applications', async (req, res) => {
     }
 });
 
-app.get('/api/applications/check', async (req, res) => {
+apiRouter.get('/applications/check', async (req, res) => {
     try {
         const { jobId, email } = req.query;
         const app = await Application.findOne({ jobId, email });
@@ -128,7 +137,7 @@ app.get('/api/applications/check', async (req, res) => {
 });
 
 // Auth & Registration
-app.post('/api/auth/register', async (req, res) => {
+apiRouter.post('/auth/register', async (req, res) => {
     try {
         const { name, email, password } = req.body;
         const existingUser = await User.findOne({ email });
@@ -143,7 +152,7 @@ app.post('/api/auth/register', async (req, res) => {
     }
 });
 
-app.post('/api/auth/login', async (req, res) => {
+apiRouter.post('/auth/login', async (req, res) => {
     try {
         const { email, password } = req.body;
         console.log(`Login attempt for: ${email}`);
@@ -188,7 +197,7 @@ app.post('/api/auth/login', async (req, res) => {
     }
 });
 
-app.get('/api/users', async (req, res) => {
+apiRouter.get('/users', async (req, res) => {
     try {
         const users = await User.find().sort({ dateJoined: -1 });
         res.json(users);
@@ -197,7 +206,7 @@ app.get('/api/users', async (req, res) => {
     }
 });
 
-app.put('/api/users/profile', async (req, res) => {
+apiRouter.put('/users/profile', async (req, res) => {
     try {
         const { email, profile } = req.body;
         const user = await User.findOneAndUpdate({ email }, { profile }, { new: true });
@@ -207,7 +216,7 @@ app.put('/api/users/profile', async (req, res) => {
     }
 });
 
-app.post('/api/admin/users/:id/ban', async (req, res) => {
+apiRouter.post('/admin/users/:id/ban', async (req, res) => {
     try {
         const user = await User.findById(req.params.id);
         if (!user) return res.status(404).json({ message: 'User not found' });
@@ -220,7 +229,7 @@ app.post('/api/admin/users/:id/ban', async (req, res) => {
 });
 
 // User Saved Jobs (Mocking specific user for now based on email)
-app.post('/api/users/save-job', async (req, res) => {
+apiRouter.post('/users/save-job', async (req, res) => {
     try {
         const { email, jobId } = req.body;
         const user = await User.findOne({ email });
@@ -239,7 +248,7 @@ app.post('/api/users/save-job', async (req, res) => {
     }
 });
 
-app.get('/api/users/:email/saved-jobs', async (req, res) => {
+apiRouter.get('/users/:email/saved-jobs', async (req, res) => {
     try {
         const user = await User.findOne({ email: req.params.email });
         if (!user) return res.json({ savedJobs: [] });
@@ -251,7 +260,7 @@ app.get('/api/users/:email/saved-jobs', async (req, res) => {
 
 
 // Seed Route
-app.post('/api/seed', async (req, res) => {
+apiRouter.post('/seed', async (req, res) => {
     try {
         console.log("Seed endpoint hit");
         const { defaultJobsData, mockApplicationsData, mockUsersData } = req.body;
