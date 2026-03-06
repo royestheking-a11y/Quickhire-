@@ -13,7 +13,7 @@ const JobSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 const ApplicationSchema = new mongoose.Schema({
-    jobId: { type: mongoose.Schema.Types.ObjectId, ref: 'Job', required: true },
+    jobId: { type: String, required: true },
     jobTitle: { type: String, required: true },
     name: { type: String, required: true },
     email: { type: String, required: true },
