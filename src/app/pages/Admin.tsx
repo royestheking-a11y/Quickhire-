@@ -479,7 +479,7 @@ export function Admin() {
                                       <FileText className="w-5 h-5" />
                                     </button>
                                     <button
-                                      onClick={() => { if (job.id) handleDeleteJob(job.id); }}
+                                      onClick={() => { const id = job.id || (job as any)._id; if (id) handleDeleteJob(id); }}
                                       className="text-red-500 hover:text-red-700 p-2 hover:bg-red-50 rounded-lg transition-colors border border-transparent hover:border-red-100"
                                       title="Delete Job"
                                     >
