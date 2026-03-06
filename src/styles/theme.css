@@ -184,6 +184,7 @@
   0% {
     background-position: -1000px 0;
   }
+
   100% {
     background-position: 1000px 0;
   }
@@ -194,4 +195,14 @@
   background-size: 1000px 100%;
   animation: shimmer 2s infinite linear;
   border-radius: 4px;
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0%);
+  }
+
+  100% {
+    transform: translateX(-100%);
+  }
 }

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { Search, MapPin, ChevronDown, ArrowRight, PenTool, TrendingUp, Megaphone, Wallet, Monitor, Code, Briefcase, Users } from 'lucide-react';
-import Slider from 'react-slick';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
@@ -39,24 +38,6 @@ export function Home() {
 
   const handleCategoryClick = (cat: string) => {
     navigate(`/jobs?category=${encodeURIComponent(cat)}`);
-  };
-
-  const sliderSettings = {
-    dots: false,
-    infinite: true,
-    speed: 3000,
-    slidesToShow: 5,
-    slidesToScroll: 1,
-    autoplay: true,
-    autoplaySpeed: 0,
-    cssEase: "linear",
-    pauseOnHover: false,
-    arrows: false,
-    responsive: [
-      { breakpoint: 1024, settings: { slidesToShow: 4 } },
-      { breakpoint: 768, settings: { slidesToShow: 3 } },
-      { breakpoint: 480, settings: { slidesToShow: 2 } }
-    ]
   };
 
   return (
@@ -139,16 +120,27 @@ export function Home() {
       {/* Companies Section */}
       <div className="pb-12 pt-4 px-6 lg:px-[124px] bg-white overflow-hidden">
         <p className="text-[#202430] opacity-50 mb-8 text-[18px]">Companies we helped grow</p>
-        <div className="mx-auto w-full max-w-7xl">
-          <Slider {...sliderSettings}>
-            <div className="flex justify-center items-center h-12 outline-none"><VodafoneLogo /></div>
-            <div className="flex justify-center items-center h-12 outline-none"><IntelLogo /></div>
-            <div className="flex justify-center items-center h-12 outline-none"><TeslaLogo /></div>
-            <div className="flex justify-center items-center h-12 outline-none"><AmdLogo /></div>
-            <div className="flex justify-center items-center h-12 outline-none"><TalkitLogo /></div>
-            <div className="flex justify-center items-center h-12 outline-none"><VodafoneLogo /></div>
-            <div className="flex justify-center items-center h-12 outline-none"><IntelLogo /></div>
-          </Slider>
+        <div className="relative w-full max-w-7xl mx-auto flex overflow-hidden">
+          {/* Fading Edges */}
+          <div className="pointer-events-none absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-white to-transparent z-10" />
+          <div className="pointer-events-none absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-white to-transparent z-10" />
+
+          <div className="flex animate-[marquee_20s_linear_infinite] whitespace-nowrap min-w-full">
+            <div className="flex items-center justify-between min-w-full gap-8 px-4">
+              <VodafoneLogo />
+              <IntelLogo />
+              <TeslaLogo />
+              <AmdLogo />
+              <TalkitLogo />
+            </div>
+            <div className="flex items-center justify-between min-w-full gap-8 px-4" aria-hidden="true">
+              <VodafoneLogo />
+              <IntelLogo />
+              <TeslaLogo />
+              <AmdLogo />
+              <TalkitLogo />
+            </div>
+          </div>
         </div>
       </div>
 
