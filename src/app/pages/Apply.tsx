@@ -64,6 +64,11 @@ export function Apply() {
     const handleApply = async (e?: React.FormEvent) => {
         if (e) e.preventDefault();
 
+        if (!formData.name || !formData.email || !formData.resume) {
+            toast.error("Please provide your name, email, and a resume link.");
+            return;
+        }
+
         setIsSubmitting(true);
         if (currentUser) {
             setShowPremiumProcessing(true);
