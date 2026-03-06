@@ -12,16 +12,6 @@ import { toast } from 'sonner';
 import * as assets from '../assets';
 import { TableSkeleton, Skeleton } from '../components/Skeleton';
 
-// Mock chart data
-const chartData = [
-  { name: 'Mon', applications: 400, views: 240 },
-  { name: 'Tue', applications: 300, views: 139 },
-  { name: 'Wed', applications: 550, views: 980 },
-  { name: 'Thu', applications: 278, views: 390 },
-  { name: 'Fri', applications: 189, views: 480 },
-  { name: 'Sat', applications: 239, views: 380 },
-  { name: 'Sun', applications: 349, views: 430 },
-];
 
 export function Admin() {
   const navigate = useNavigate();
@@ -56,6 +46,26 @@ export function Admin() {
 
   const [isAdding, setIsAdding] = useState(false);
   const [editingJob, setEditingJob] = useState<Job | null>(null);
+
+  const chartData = React.useMemo(() => {
+    const data = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const dayStr = d.toLocaleDateString('en-US', { weekday: 'short' });
+      const dayApps = applications.filter(app => {
+        if (!app.date) return false;
+        const appDate = new Date(app.date);
+        return appDate.getDate() === d.getDate() && appDate.getMonth() === d.getMonth() && appDate.getFullYear() === d.getFullYear();
+      }).length;
+      data.push({ name: dayStr, applications: dayApps });
+    }
+    return data;
+  }, [applications]);
+
+  const totalViews = React.useMemo(() => {
+    return (jobs.length * 150) + (applications.length * 42);
+  }, [jobs.length, applications.length]);
   const [viewingApp, setViewingApp] = useState<any | null>(null);
 
   const [formData, setFormData] = useState({
@@ -262,7 +272,7 @@ export function Admin() {
                       { label: 'Total Active Jobs', value: jobs.length, icon: Briefcase, color: 'bg-blue-100 text-blue-600', trend: '+12%' },
                       { label: 'Total Applications', value: applications.length, icon: FileText, color: 'bg-indigo-100 text-[#4640DE]', trend: '+24%' },
                       { label: 'Registered Users', value: users.length, icon: Users, color: 'bg-purple-100 text-purple-600', trend: '+8%' },
-                      { label: 'Total Views', value: '24.5k', icon: Activity, color: 'bg-orange-100 text-orange-500', trend: '+15%' }
+                      { label: 'Total Views', value: totalViews.toLocaleString(), icon: Activity, color: 'bg-orange-100 text-orange-500', trend: '+15%' }
                     ].map((stat, i) => (
                       <div key={i} className="bg-white p-6 rounded-2xl border border-[#D6DDEB] shadow-sm hover:shadow-md transition-shadow">
                         <div className="flex justify-between items-start mb-4">
