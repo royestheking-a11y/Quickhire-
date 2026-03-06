@@ -15,12 +15,39 @@ app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
-// MongoDB connection
-mongoose.connect(process.env.MONGODB_URI)
-    .then(() => console.log('Connected to MongoDB Atlas'))
-    .catch(err => console.error('MongoDB connection error:', err));
+// MongoDB Serverless Connection Logic
+let cachedDb = null;
+
+const connectToDatabase = async () => {
+    if (cachedDb) return cachedDb;
+
+    // For Vercel Serverless, ensure connections don't hang by setting pooling options
+    const db = await mongoose.connect(process.env.MONGODB_URI, {
+        bufferCommands: false,
+    });
+
+    cachedDb = db;
+    console.log('Connected to MongoDB Atlas');
+    return db;
+};
+
+// Connect immediately for long-running processes (like local dev)
+connectToDatabase().catch(err => console.error('MongoDB connection error:', err));
 
 // --- API Routes ---
+
+// Vercel Serverless DB Middleware - Ensure connection before processing request
+const requireDb = async (req, res, next) => {
+    try {
+        await connectToDatabase();
+        next();
+    } catch (err) {
+        console.error("Failed to connect to DB in middleware:", err);
+        res.status(500).json({ error: "Database connection failed" });
+    }
+};
+
+app.use('/api', requireDb);
 
 // Jobs
 app.get('/api/jobs', async (req, res) => {
@@ -271,6 +298,10 @@ app.post('/api/seed', async (req, res) => {
 });
 
 
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
+if (process.env.NODE_ENV !== 'production') {
+    app.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`);
+    });
+}
+
+export default app;
