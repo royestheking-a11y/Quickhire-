@@ -204,13 +204,13 @@ export function Apply() {
                             ) : (
                                 <form onSubmit={handleApply} className="space-y-8 flex-1">
                                     {currentUser && (
-                                        <div className="bg-[#4640DE]/5 p-6 rounded-3xl border border-[#4640DE]/10 mb-2 flex items-center justify-between">
+                                        <div className="bg-[#4640DE]/5 p-6 rounded-3xl border border-[#4640DE]/10 mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                                             <div className="flex items-center gap-4">
-                                                <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center border border-[#D6DDEB]">
+                                                <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center border border-[#D6DDEB] shrink-0">
                                                     <User className="w-6 h-6 text-[#4640DE]" />
                                                 </div>
                                                 <div>
-                                                    <p className="font-bold text-[#25324b]">Fast Apply as {currentUser.name}</p>
+                                                    <p className="font-bold text-[#25324b] break-all sm:break-normal">Fast Apply as {currentUser.name}</p>
                                                     <p className="text-xs text-[#515b6f]">Using your saved profile details</p>
                                                 </div>
                                             </div>
@@ -218,9 +218,9 @@ export function Apply() {
                                                 type="button"
                                                 onClick={() => handleApply()}
                                                 disabled={isSubmitting}
-                                                className="bg-[#4640DE] text-white px-6 py-3 rounded-xl font-bold hover:bg-[#4640DE]/90 transition-all flex items-center gap-2"
+                                                className="w-full sm:w-auto bg-[#4640DE] text-white px-6 py-3 rounded-xl font-bold hover:bg-[#4640DE]/90 transition-all flex items-center justify-center gap-2"
                                             >
-                                                <Zap className="w-4 h-4" /> One-Click Apply
+                                                <Zap className="w-4 h-4 shrink-0" /> One-Click Apply
                                             </button>
                                         </div>
                                     )}
